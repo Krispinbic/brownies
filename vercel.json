@@ -1,5 +1,6 @@
 {
-  "framework": null,
-  "buildCommand": null,
-  "installCommand": null
+  "version": 2,
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.js" }
+  ]
 }

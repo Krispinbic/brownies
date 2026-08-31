@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle de Vendas - Brownies R$ 3,00</title>
+  <style>
+    :root {
+      --primary: #5c3d2e;
+      --accent: #b85c38;
+      --bg: #f8f5f2;
+      --card-bg: #ffffff;
+      --text: #2d2424;
+      --danger: #d9534f;
+      --success: #2e7d32;
+      --pix: #00875f;
+      --warning: #f0ad4e;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: var(--primary);
+      margin-top: 5px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background-color: var(--accent);
+    }
+
+    .btn-danger { background-color: var(--danger); margin-top: 5px; }
+    .btn-warning { background-color: var(--warning); margin-top: 5px; color: #333; }
+    .btn-success { background-color: var(--success); margin-top: 5px; }
+
+    .result-box {
+      background-color: #fff8e7;
+      border-left: 5px solid var(--accent);
+      padding: 15px;
+      margin-top: 15px;
+      border-radius: 4px;
+    }
+
+    .debt-amount {
+      font-size: 20px;
+      color: var(--danger);
+      font-weight: bold;
+    }
+
+    .history-list {
+      list-style-type: none;
+      padding: 0;
+      max-height: 350px;
+      overflow-y: auto;
+    }
+
+    .history-item {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: #fafafa;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .history-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .history-actions button {
+      padding: 6px 10px;
+      font-size: 13px;
+      margin-top: 0;
+      width: auto;
+    }
+
+    .badge-fiado { color: var(--danger); font-weight: bold; }
+    .badge-dinheiro { color: var(--success); font-weight: bold; }
+    .badge-pix { color: var(--pix); font-weight: bold; }
+    .partial-box { display: flex; gap: 8px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>🍫 Vendas de Brownie (R$ 3,00)</h1>
+
+    <!-- FORMULÁRIO DE NOVA VENDA -->
+    <div class="card">
+      <h2>Registrar Venda</h2>
+      <label for="clientName">Nome do Cliente:</label>
+      <input type="text" id="clientName" placeholder="Ex: João Silva">
+
+      <label for="quantity">Quantidade de Brownies:</label>
+      <input type="number" id="quantity" value="1" min="1" oninput="updateTotal()">
+
+      <p><strong>Total: R$ <span id="totalPrice">3.00</span></strong></p>
+
+      <label for="paymentStatus">Forma de Pagamento / Status:</label>
+      <select id="paymentStatus">
+        <option value="Dinheiro">Dinheiro Físico</option>
+        <option value="Pix">Pix</option>
+        <option value="Fiado">Fiado (Ficou devendo)</option>
+      </select>
+
+      <button onclick="registerSale()">Registrar Venda</button>
+    </div>
+
+    <!-- CONSULTA E PAGAMENTO DE DÍVIDAS -->
+    <div class="card">
+      <h2>Consultar Saldo / Dívidas</h2>
+      <label for="searchName">Nome do Cliente:</label>
+      <input type="text" id="searchName" placeholder="Ex: João Silva">
+      <button onclick="checkBalance()">Consultar Saldo</button>
+
+      <div id="searchResult" class="result-box" style="display: none;">
+        <p>Cliente: <strong id="resClientName">-</strong></p>
+        <p>Total em Dívidas: <span class="debt-amount" id="resDebtAmount">R$ 0,00</span></p>
+
+        <div id="paymentOptions" style="display: none;">
+          <label for="payMethod">Forma de Pagamento da Dívida:</label>
+          <select id="payMethod">
+            <option value="Dinheiro">Dinheiro Físico</option>
+            <option value="Pix">Pix</option>
+          </select>
+
+          <label for="payAmount">Abater/Pagar um Valor (R$):</label>
+          <div class="partial-box">
+            <input type="number" id="payAmount" step="0.50" placeholder="Ex: 5.00">
+            <button class="btn-warning" onclick="payPartialDebt()">Abater Valor</button>
+          </div>
+          <button class="btn-success" onclick="payOffDebt()">Quitar Tudo</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTÓRICO DE VENDAS -->
+    <div class="card">
+      <h2>Histórico de Vendas</h2>
+      <ul id="historyList" class="history-list"></ul>
+    </div>
+  </div>
+
+  <script>
+   const PRICE_PER_UNIT = 3.00;
+let sales = [];
+
+// Buscar todas as vendas do Supabase via Backend
+async function loadSales() {
+  try {
+    const response = await fetch('/api/sales');
+    sales = await response.json();
+    renderHistory();
+  } catch (err) {
+    console.error('Erro ao carregar vendas:', err);
+  }
+}
+
+function updateTotal() {
+  const qty = document.getElementById('quantity').value || 0;
+  const total = qty * PRICE_PER_UNIT;
+  document.getElementById('totalPrice').innerText = total.toFixed(2);
+}
+
+// Registrar nova venda
+async function registerSale() {
+  const nameInput = document.getElementById('clientName');
+  const qtyInput = document.getElementById('quantity');
+  const statusInput = document.getElementById('paymentStatus');
+
+  const name = nameInput.value.trim();
+  const quantity = parseInt(qtyInput.value);
+  const status = statusInput.value;
+
+  if (!name || isNaN(quantity) || quantity <= 0) {
+    alert("Preencha o nome e uma quantidade válida.");
+    return;
+  }
+
+  const newSale = {
+    name: name,
+    quantity: quantity,
+    total: quantity * PRICE_PER_UNIT,
+    status: status,
+    date: new Date().toLocaleDateString('pt-BR')
+  };
+
+  try {
+    const response = await fetch('/api/sales', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newSale)
+    });
+    
+    if (response.ok) {
+      nameInput.value = '';
+      qtyInput.value = '1';
+      updateTotal();
+      await loadSales();
+      alert(`Venda registrada para ${name}!`);
+    }
+  } catch (err) {
+    alert("Erro ao salvar a venda.");
+  }
+}
+
+// Consultar saldo de dívidas
+function checkBalance() {
+  const searchName = document.getElementById('searchName').value.trim();
+  if (!searchName) {
+    alert("Digite um nome para consultar.");
+    return;
+  }
+
+  const clientDebts = sales
+    .filter(s => s.name.toLowerCase() === searchName.toLowerCase() && s.status === 'Fiado')
+    .reduce((sum, s) => sum + Number(s.total), 0);
+
+  document.getElementById('resClientName').innerText = searchName;
+  document.getElementById('resDebtAmount').innerText = `R$ ${clientDebts.toFixed(2)}`;
+  document.getElementById('searchResult').style.display = 'block';
+
+  document.getElementById('paymentOptions').style.display = clientDebts > 0 ? 'block' : 'none';
+}
+
+// Excluir venda
+async function deleteSale(id) {
+  if (confirm("Tem certeza que deseja excluir esta venda?")) {
+    await fetch(`/api/sales/${id}`, { method: 'DELETE' });
+    await loadSales();
+  }
+}
+
+// Renderizar histórico na tela
+function renderHistory() {
+  const historyList = document.getElementById('historyList');
+  historyList.innerHTML = '';
+
+  if (sales.length === 0) {
+    historyList.innerHTML = '<p style="text-align:center; color:#888;">Nenhuma venda registrada.</p>';
+    return;
+  }
+
+  sales.forEach(s => {
+    const li = document.createElement('li');
+    li.className = 'history-item';
+    
+    let badgeClass = 'badge-dinheiro';
+    if (s.status === 'Fiado') badgeClass = 'badge-fiado';
+    if (s.status === 'Pix') badgeClass = 'badge-pix';
+
+    li.innerHTML = `
+      <div class="history-header">
+        <span><strong>${s.name}</strong> (${s.quantity}x Brownie) - ${s.date}</span>
+        <span class="${badgeClass}">${s.status}</span>
+      </div>
+      <div class="history-header">
+        <span><strong>Total: R$ ${Number(s.total).toFixed(2)}</strong></span>
+        <div class="history-actions">
+          <button class="btn-danger" onclick="deleteSale(${s.id})">Excluir</button>
+        </div>
+      </div>
+    `;
+    historyList.appendChild(li);
+  });
+}
+
+// Carregar ao abrir a página
+loadSales();
+  </script>
+
+</body>
+</html>
