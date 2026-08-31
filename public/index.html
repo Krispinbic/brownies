@@ -141,23 +141,22 @@
 
     <!-- FORMULÁRIO DE NOVA VENDA -->
     <div class="card">
-      <h2>Registrar Venda</h2>
-      <label for="clientName">Nome do Cliente:</label>
-      <input type="text" id="clientName" placeholder="Ex: João Silva">
+     <label for="clientName">Nome do Cliente:</label>
+<input type="text" id="clientName" placeholder="Ex: João Silva">
 
-      <label for="quantity">Quantidade de Brownies:</label>
-      <input type="number" id="quantity" value="1" min="1" oninput="updateTotal()">
+<label for="quantity">Quantidade de Brownies:</label>
+<input type="number" id="quantity" value="1" min="1" oninput="updateTotal()">
 
-      <p><strong>Total: R$ <span id="totalPrice">3.00</span></strong></p>
+<p><strong>Total: R$ <span id="totalPrice">3.00</span></strong></p>
 
-      <label for="paymentStatus">Forma de Pagamento / Status:</label>
-      <select id="paymentStatus">
-        <option value="Dinheiro">Dinheiro Físico</option>
-        <option value="Pix">Pix</option>
-        <option value="Fiado">Fiado (Ficou devendo)</option>
-      </select>
+<label for="paymentStatus">Forma de Pagamento / Status:</label>
+<select id="paymentStatus">
+  <option value="Dinheiro">Dinheiro Físico</option>
+  <option value="Pix">Pix</option>
+  <option value="Fiado">Fiado (Ficou devendo)</option>
+</select>
 
-      <button onclick="registerSale()">Registrar Venda</button>
+<button type="button" onclick="registerSale()">Registrar Venda</button>
     </div>
 
     <!-- CONSULTA E PAGAMENTO DE DÍVIDAS -->
